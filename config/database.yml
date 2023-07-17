@@ -84,3 +84,4 @@ test:
 production:
   <<: *default
   database: plannerapi_production
+  url: <%= ENV['DATABASE_URL'] %>
