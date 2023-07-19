@@ -3,14 +3,25 @@
 require 'rails_helper'
 
 RSpec.describe 'Api::V1::Tasks', type: :request do
+  include AuthHelper
+
+  # User that  is accessing the resource
+  let!(:user) do
+    User.create(
+      firstname: 'john',
+      lastname: 'wick',
+      email: 'john.wick@example.com',
+      password: 'password',
+      password_confirmation: 'password'
+    )
+  end
+  let!(:category) { FactoryBot.create(:category, user: user) }
+
   describe 'GET /index' do
     context 'with correct authorization' do
-      let(:user) { FactoryBot.create(:user) }
-      let(:category) { FactoryBot.create(:category, user:) }
-
       before do
         generate_tasks(category, user)
-        get "/api/v1/users/#{user.id}/categories/#{category.id}/tasks"
+        get "/api/v1/users/#{user.id}/categories/#{category.id}/tasks", headers: { 'Authorization' => header(user) }
       end
 
       it 'returns correct json message' do
@@ -39,8 +50,7 @@ RSpec.describe 'Api::V1::Tasks', type: :request do
 
   describe 'POST /create' do
     context 'creates resource with valid parameters' do
-      let(:user) { FactoryBot.create(:user) }
-      let(:category) { FactoryBot.create(:category, user:) }
+      let(:category) { FactoryBot.create(:category, user: user) }
       let(:task_params) { FactoryBot.attributes_for(:task) }
 
       before do
@@ -65,8 +75,7 @@ RSpec.describe 'Api::V1::Tasks', type: :request do
     end
 
     context 'does not create resource with invalid parameters' do
-      let(:user) { FactoryBot.create(:user) }
-      let(:category) { FactoryBot.create(:category, user:) }
+      let(:category) { FactoryBot.create(:category, user:user) }
       let(:invalid_task_params) { FactoryBot.attributes_for(:incorrect_task) }
 
       before do
@@ -81,12 +90,11 @@ RSpec.describe 'Api::V1::Tasks', type: :request do
 
   describe 'GET /show' do
     context 'shows the resource' do
-      let(:user) { FactoryBot.create(:user) }
-      let(:category) { FactoryBot.create(:category, user:) }
-      let(:task) { FactoryBot.create(:task, user:, category:) }
+      let(:category) { FactoryBot.create(:category, user: user) }
+      let(:task) { FactoryBot.create(:task, user: user, category:) }
 
       before do
-        get "/api/v1/users/#{user.id}/categories/#{category.id}/tasks/#{task.id}"
+        get "/api/v1/users/#{user.id}/categories/#{category.id}/tasks/#{task.id}", headers: { 'Authorization' => header(user) }
       end
 
       it 'return the correct json message' do
@@ -109,13 +117,12 @@ RSpec.describe 'Api::V1::Tasks', type: :request do
 
   describe 'PATCH /update' do
     context 'updates the resource' do
-      let(:user) { FactoryBot.create(:user) }
-      let(:category) { FactoryBot.create(:category, user:) }
-      let(:task) { FactoryBot.create(:task, category:, user:) }
+      let(:category) { FactoryBot.create(:category, user: user) }
+      let(:task) { FactoryBot.create(:task, category: category, user: user) }
       let(:updated_task) { FactoryBot.attributes_for(:task) }
 
       before do
-        patch "/api/v1/users/#{user.id}/categories/#{category.id}/tasks/#{task.id}", params: { task: updated_task }
+        patch "/api/v1/users/#{user.id}/categories/#{category.id}/tasks/#{task.id}", params: { task: updated_task }, headers: { 'Authorization' => header(user) }
       end
 
       it 'return the correct json message' do
@@ -138,12 +145,11 @@ RSpec.describe 'Api::V1::Tasks', type: :request do
 
   describe 'DELETE /destroy' do
     context 'deletes the resource' do
-      let(:user) { FactoryBot.create(:user) }
-      let(:category) { FactoryBot.create(:category, user:) }
-      let(:task) { FactoryBot.create(:task, category:, user:) }
+      let(:category) { FactoryBot.create(:category, user: user) }
+      let(:task) { FactoryBot.create(:task, category: category, user: user) }
 
       before do
-        delete "/api/v1/users/#{user.id}/categories/#{category.id}/tasks/#{task.id}"
+        delete "/api/v1/users/#{user.id}/categories/#{category.id}/tasks/#{task.id}", headers: { 'Authorization' => header(user) }
       end
 
       it 'return the correct json message' do
@@ -158,15 +164,16 @@ RSpec.describe 'Api::V1::Tasks', type: :request do
 
   describe 'set_tasks' do
     context 'with incorrect tasks' do
-      let(:task) { FactoryBot.create(:task) }
-      let(:user_id) { task.user.id }
-      let(:category_id) { task.category.id }
+
+      let(:category) { FactoryBot.create(:category, user: user) }
+      let(:task) { FactoryBot.create(:task, category: category, user: user) }
       let(:incorrect_task_id) { task.id + 1 }
 
+
       before do
-        patch "http://localhost:3000/api/v1/users/#{user_id}/categories/#{category_id}/tasks/#{incorrect_task_id}"
-        get "http://localhost:3000/api/v1/users/#{user_id}/categories/#{category_id}/tasks/#{incorrect_task_id}"
-        delete "http://localhost:3000/api/v1/users/#{user_id}/categories/#{category_id}/tasks/#{incorrect_task_id}"
+        patch "http://localhost:3000/api/v1/users/#{user.id}/categories/#{category.id}/tasks/#{incorrect_task_id}", headers: { 'Authorization' => header(user) }
+        get "http://localhost:3000/api/v1/users/#{user.id}/categories/#{category.id}/tasks/#{incorrect_task_id}",  headers: { 'Authorization' => header(user) }
+        delete "http://localhost:3000/api/v1/users/#{user.id}/categories/#{category.id}/tasks/#{incorrect_task_id}", headers: { 'Authorization' => header(user) }
       end
 
       it 'returns correct json error message' do
@@ -180,6 +187,6 @@ RSpec.describe 'Api::V1::Tasks', type: :request do
   end
 
   def generate_tasks(category, user)
-    FactoryBot.create_list(:task, 10, category:, user:)
+    FactoryBot.create_list(:task, 10, category: category, user: user)
   end
 end

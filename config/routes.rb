@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   # root "articles#index"
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
+      resources :auth
       resources :users do
         resources :categories do
           resources :tasks

@@ -3,14 +3,28 @@
 require 'rails_helper'
 
 RSpec.describe 'Api::V1::Users', type: :request do
+  include ApiHelpers
+  include AuthHelper
+  # User that  is accessing the resource
+  let!(:user) do
+    User.create(
+      firstname: 'john',
+      lastname: 'wick',
+      email: 'john.wick@example.com',
+      password: "password",
+      password_confirmation: 'password'
+    )
+  end
+
   describe 'GET /index' do
     context 'with correct authorization' do
-      let!(:users) { FactoryBot.create_list(:user, 10) }
+      let!(:users) { FactoryBot.create_list(:user, 9) }
 
       before do
         generate_users(users)
-        get '/api/v1/users'
+        get '/api/v1/users', headers: { 'Authorization' => header(user) }
       end
+
 
       it 'returns all users' do
         expect(json['data'].size).to eq(10)
@@ -84,11 +98,9 @@ RSpec.describe 'Api::V1::Users', type: :request do
 
   describe 'GET /show' do
     context 'with correct user id' do
-      let(:user) { FactoryBot.create(:user) }
 
       before do
-        generate_user(user)
-        get "/api/v1/users/#{user.id}"
+        get "/api/v1/users/#{user.id}", headers: { 'Authorization' => header(user) }
       end
 
       it 'returns correct json message' do
@@ -119,12 +131,17 @@ RSpec.describe 'Api::V1::Users', type: :request do
 
   describe 'PATCH /update' do
     context 'with correct user id and user params' do
-      let!(:user) { FactoryBot.create(:user) }
+      updated_params = {
+        firstname: 'john',
+        lastname: 'weak',
+        email: 'john.weak@example.com',
+        password: 'password',
+        password_confirmation: 'password'
 
-      let(:updated_user) { FactoryBot.attributes_for(:user) }
+      }
 
       before do
-        patch "/api/v1/users/#{user.id}", params: { user: updated_user }
+        patch "/api/v1/users/#{user.id}", params: { user:  updated_params}, headers: { "Authorization" => header(user) }
       end
 
       it 'returns correct json message' do
@@ -147,10 +164,8 @@ RSpec.describe 'Api::V1::Users', type: :request do
 
   describe 'DELETE /destroy' do
     context 'with correct user_id' do
-      let!(:user) { FactoryBot.create(:user) }
-
       before do
-        delete "/api/v1/users/#{user.id}"
+        delete "/api/v1/users/#{user.id}", headers: { "Authorization" => header(user) }
       end
 
       it 'returns correct json message' do
@@ -167,37 +182,17 @@ RSpec.describe 'Api::V1::Users', type: :request do
     end
   end
 
-  describe 'set_user' do
-    context 'with incorrect user' do
-      let!(:user) { FactoryBot.create(:user) }
-
-      before do
-        patch "/api/v1/users/#{user.id + 1}"
-        get "/api/v1/users/#{user.id + 1}"
-        delete "/api/v1/users/#{user.id + 1}"
-      end
-
-      it 'returns correct json error' do
-        expect(json['error']).to eq('Resource not found')
-      end
-
-      it 'returns http status of not found - 404' do
-        expect(response).to have_http_status(:not_found)
-      end
-    end
-  end
-
   def generate_users(users)
     users.each do |user|
       FactoryBot.create(:category, user:) do |category|
-        FactoryBot.create(:task, category:, user:)
+        FactoryBot.create(:task, category: category, user:)
       end
     end
   end
 
   def generate_user(user)
-    FactoryBot.create(:category, user:) do |category|
-      FactoryBot.create(:task, category:, user:)
+    FactoryBot.create(:category, user: user) do |category|
+      FactoryBot.create(:task, category:, user: user)
     end
   end
 

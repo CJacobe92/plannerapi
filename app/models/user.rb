@@ -8,9 +8,9 @@ class User < ApplicationRecord
 
   # validations
 
-  validates :firstname, presence: true
-  validates :lastname, presence: true
-  validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
-  validates :password, presence: true
-  validates :password_confirmation, presence: true
+  validates :firstname, presence: true, on: :create
+  validates :lastname, presence: true, on: :create
+  validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }, on: :create
+  validates :password, presence: true, on: :create
+  validates :password_confirmation, presence: true, on: :create
 end

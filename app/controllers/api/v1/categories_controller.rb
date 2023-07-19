@@ -45,7 +45,6 @@ module Api
       end
 
       def set_category
-        @current_user = User.find(params[:user_id])
         @current_category = @current_user.categories.find(params[:id])
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Category not found' }, status: :not_found
