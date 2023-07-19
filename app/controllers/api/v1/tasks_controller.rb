@@ -5,7 +5,7 @@
 module Api
   module V1
     class TasksController < ApplicationController
-      before_action :set_task, except: %i[index create]
+      before_action :set_task, except: [:create, :index]
 
       def index
         @tasks = Task.all
@@ -39,12 +39,10 @@ module Api
       private
 
       def task_params
-        params.require(:task).permit(:name, :urgent, :completed).merge(user_id: params[:user_id],
-                                                                       category_id: params[:category_id])
+        params.require(:task).permit(:name, :urgent, :completed).merge(user_id: params[:user_id], category_id: params[:category_id])
       end
 
       def set_task
-        @current_user = User.find(params[:user_id])
         @current_category = @current_user.categories.find(params[:category_id])
         @current_task = @current_category.tasks.find(params[:id])
       rescue ActiveRecord::RecordNotFound

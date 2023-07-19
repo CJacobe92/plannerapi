@@ -3,13 +3,25 @@
 require 'rails_helper'
 
 RSpec.describe 'Api::V1::Categories', type: :request do
+  include AuthHelper
+
+# User that  is accessing the resource
+  let!(:user) do
+    User.create(
+      firstname: 'john',
+      lastname: 'wick',
+      email: 'john.wick@example.com',
+      password: 'password',
+      password_confirmation: 'password'
+    )
+  end
+
   describe 'GET /index' do
     context 'with correct authorization' do
-      let!(:user) { FactoryBot.create(:user) }
 
       before do
         generate_user(user)
-        get "/api/v1/users/#{user.id}/categories"
+        get "/api/v1/users/#{user.id}/categories",  headers: { 'Authorization' => header(user) }
       end
 
       it 'returns correct json message' do
@@ -84,13 +96,10 @@ RSpec.describe 'Api::V1::Categories', type: :request do
 
   describe 'GET /show' do
     context 'with correct category id ' do
-      let!(:user) { FactoryBot.create(:user) }
-      let!(:category) do
-        FactoryBot.create(:category, user:)
-      end
+      let!(:category) {FactoryBot.create(:category, user: user)}
 
       before do
-        get "http://localhost:3000/api/v1/users/#{user.id}/categories/#{category.id}"
+        get "http://localhost:3000/api/v1/users/#{user.id}/categories/#{category.id}", headers: { 'Authorization' => header(user) }
       end
 
       it 'returns correct json message' do
@@ -113,17 +122,14 @@ RSpec.describe 'Api::V1::Categories', type: :request do
 
   describe 'PATCH /update' do
     context 'with correct category id ' do
-      let!(:user) { FactoryBot.create(:user) }
-      let!(:category) do
-        FactoryBot.create(:category, user:)
-      end
+      let!(:category) {FactoryBot.create(:category, user: user)}
 
       let!(:updated_category) do
         FactoryBot.attributes_for(:category)
       end
 
       before do
-        patch "http://localhost:3000/api/v1/users/#{user.id}/categories/#{category.id}", params: { category: updated_category }
+        patch "http://localhost:3000/api/v1/users/#{user.id}/categories/#{category.id}", params: { category: updated_category }, headers: { 'Authorization' => header(user) }
       end
 
       it 'returns correct json message' do
@@ -146,13 +152,11 @@ RSpec.describe 'Api::V1::Categories', type: :request do
 
   describe 'DELETE /destroy' do
     context 'with correct category id ' do
-      let!(:user) { FactoryBot.create(:user) }
-      let!(:category) do
-        FactoryBot.create(:category, user:)
-      end
+
+      let!(:category) {FactoryBot.create(:category, user: user)}
 
       before do
-        delete "http://localhost:3000/api/v1/users/#{user.id}/categories/#{category.id}"
+        delete "http://localhost:3000/api/v1/users/#{user.id}/categories/#{category.id}", headers: { 'Authorization' => header(user) }
       end
 
       it 'returns correct json message' do
@@ -176,9 +180,9 @@ RSpec.describe 'Api::V1::Categories', type: :request do
       let!(:incorrect_category_id) { category.id + 1 }
 
       before do
-        patch "http://localhost:3000/api/v1/users/#{user_id}/categories/#{incorrect_category_id}"
-        get "http://localhost:3000/api/v1/users/#{user_id}/categories/#{incorrect_category_id}"
-        delete "http://localhost:3000/api/v1/users/#{user_id}/categories/#{incorrect_category_id}"
+        patch "http://localhost:3000/api/v1/users/#{user_id}/categories/#{incorrect_category_id}", headers: { 'Authorization' => header(user) }
+        get "http://localhost:3000/api/v1/users/#{user_id}/categories/#{incorrect_category_id}", headers: { 'Authorization' => header(user) }
+        delete "http://localhost:3000/api/v1/users/#{user_id}/categories/#{incorrect_category_id}", headers: { 'Authorization' => header(user) }
       end
 
       it 'returns correct json error message' do
@@ -192,8 +196,9 @@ RSpec.describe 'Api::V1::Categories', type: :request do
   end
 
   def generate_user(user)
-    FactoryBot.create_list(:category, 10, user:) do |category|
-      FactoryBot.create(:task, category:, user:)
+    categories = FactoryBot.create_list(:category, 10, user: user)
+    categories.each do |category|
+      FactoryBot.create(:task, category: category, user: user)
     end
   end
 

@@ -5,8 +5,6 @@
 module Api
   module V1
     class UsersController < ApplicationController
-      before_action :set_user, except: %i[create index]
-
       def index
         @users = User.includes(categories: :tasks)
         render 'index', status: :ok
@@ -23,6 +21,7 @@ module Api
       end
 
       def show
+        @current_user
         render 'show', status: :ok
       end
 
@@ -42,12 +41,6 @@ module Api
 
       def user_params
         params.require(:user).permit(:firstname, :lastname, :email, :password, :password_confirmation)
-      end
-
-      def set_user
-        @current_user = User.find(params[:id])
-      rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Resource not found' }, status: :not_found
       end
     end
   end
