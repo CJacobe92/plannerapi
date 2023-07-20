@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 # Controller responsible for handling API endpoints related to users.
+require 'headers_helper'
 
 module Api
   module V1
     class UsersController < ApplicationController
+    include HeadersHelper
       def index
         @users = User.includes(categories: :tasks)
         render 'index', status: :ok
@@ -14,6 +16,9 @@ module Api
         @user = User.new(user_params)
 
         if @user.save
+          token = encode_token(id: @user.id, firstname: @user.firstname, lastname: @user.lastname, email: @user.email, valid: true)
+          @user.update!(token: token)
+          response_headers(token)
           render 'create', status: :created
         else
           render 'create', status: :unprocessable_entity
