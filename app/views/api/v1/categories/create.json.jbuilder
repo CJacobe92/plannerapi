@@ -5,6 +5,6 @@ if @category&.errors&.any?
 elsif @category.save
   json.message 'Category created'
   json.data do
-    json.extract! @category, :id, :name, :created_at, :updated_at
+    json.extract! @category, :id, :name, :user_id, :created_at, :updated_at
   end
 end
