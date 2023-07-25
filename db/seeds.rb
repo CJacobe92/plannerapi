@@ -6,3 +6,12 @@
 #
 #   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
 #   Character.create(name: "Luke", movie: movies.first)
+
+@user = User.new(email: 'testuser@email.com', password: 'password', password_confirmation: 'password')
+
+
+@user.save
+
+@category = @user.categories.create(name: 'Personal')
+
+@user.categories.find(@category.id).tasks.create(name: 'Get coffee', urgent: true, completed: false)

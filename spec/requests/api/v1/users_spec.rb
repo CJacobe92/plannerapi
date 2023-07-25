@@ -8,8 +8,6 @@ RSpec.describe 'Api::V1::Users', type: :request do
   # User that  is accessing the resource
   let!(:user) do
     User.create(
-      firstname: 'john',
-      lastname: 'wick',
       email: 'john.wick@example.com',
       password: "password",
       password_confirmation: 'password'
@@ -81,7 +79,7 @@ RSpec.describe 'Api::V1::Users', type: :request do
       end
 
       it 'returns the user with the expected keys' do
-        expect(json['data'].size).to eq(6)
+        expect(json['data'].size).to eq(4)
       end
     end
 
@@ -132,8 +130,6 @@ RSpec.describe 'Api::V1::Users', type: :request do
   describe 'PATCH /update' do
     context 'with correct user id and user params' do
       updated_params = {
-        firstname: 'john',
-        lastname: 'weak',
         email: 'john.weak@example.com',
         password: 'password',
         password_confirmation: 'password'
@@ -157,7 +153,7 @@ RSpec.describe 'Api::V1::Users', type: :request do
       end
 
       it 'returns the user with the expected keys' do
-        expect(json['data'].size).to eq(6)
+        expect(json['data'].size).to eq(4)
       end
     end
   end
@@ -197,19 +193,19 @@ RSpec.describe 'Api::V1::Users', type: :request do
   end
 
   def assert_user_keys(user)
-    expect(user.size).to eq(7)
+    expect(user.size).to eq(5)
   end
 
   def assert_category_keys(data)
     data['categories'].each do |category|
-      expect(category.size).to eq(5)
+      expect(category.size).to eq(6)
     end
   end
 
   def assert_task_keys(data)
     data['categories'].each do |category|
       category['tasks'].each do |task|
-        expect(task.size).to eq(6)
+        expect(task.size).to eq(8)
       end
     end
   end

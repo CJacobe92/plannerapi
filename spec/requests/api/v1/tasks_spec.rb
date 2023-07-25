@@ -8,8 +8,6 @@ RSpec.describe 'Api::V1::Tasks', type: :request do
   # User that  is accessing the resource
   let!(:user) do
     User.create(
-      firstname: 'john',
-      lastname: 'wick',
       email: 'john.wick@example.com',
       password: 'password',
       password_confirmation: 'password'
@@ -42,7 +40,7 @@ RSpec.describe 'Api::V1::Tasks', type: :request do
 
       it 'returns the task with all the expected keys' do
         json['data'].each do |task|
-          expect(task.size).to eq(6)
+          expect(task.size).to eq(8)
         end
       end
     end
@@ -110,7 +108,7 @@ RSpec.describe 'Api::V1::Tasks', type: :request do
       end
 
       it 'returns task with the expected keys' do
-        expect(json['data'].size).to eq(6)
+        expect(json['data'].size).to eq(8)
       end
     end
   end
@@ -138,7 +136,7 @@ RSpec.describe 'Api::V1::Tasks', type: :request do
       end
 
       it 'returns task with the expected keys' do
-        expect(json['data'].size).to eq(6)
+        expect(json['data'].size).to eq(8)
       end
     end
   end

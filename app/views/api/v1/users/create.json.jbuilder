@@ -5,6 +5,6 @@ if @user&.errors&.any?
 elsif @user.save
   json.message 'User created'
   json.data do
-    json.extract! @user, :id, :firstname, :lastname, :email, :created_at, :updated_at
+    json.extract! @user, :id, :email, :created_at, :updated_at
   end
 end

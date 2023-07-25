@@ -9,8 +9,6 @@ RSpec.describe User, type: :model do
   end
 
   describe 'presence validations' do
-    it { is_expected.to validate_presence_of(:firstname) }
-    it { is_expected.to validate_presence_of(:lastname) }
     it { is_expected.to validate_presence_of(:email) }
     it { is_expected.to validate_presence_of(:password) }
     it { is_expected.to validate_presence_of(:password_confirmation) }
@@ -40,7 +38,7 @@ RSpec.describe User, type: :model do
 
   describe 'password authentication' do
     let!(:user) do
-      described_class.new(firstname: 'john', lastname: 'doe', email: 'john.doe@email.com', password: 'password',
+      described_class.new(email: 'john.doe@email.com', password: 'password',
                           password_confirmation: 'password')
     end
 

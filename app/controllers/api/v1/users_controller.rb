@@ -16,9 +16,9 @@ module Api
         @user = User.new(user_params)
 
         if @user.save
-          token = encode_token(id: @user.id, firstname: @user.firstname, lastname: @user.lastname, email: @user.email, valid: true)
+          token = encode_token(id: @user.id, email: @user.email, valid: true)
           @user.update!(token: token)
-          response_headers(token)
+          response_headers(@user, token)
           render 'create', status: :created
         else
           render 'create', status: :unprocessable_entity
@@ -45,7 +45,7 @@ module Api
       private
 
       def user_params
-        params.require(:user).permit(:firstname, :lastname, :email, :password, :password_confirmation)
+        params.require(:user).permit(:email, :password, :password_confirmation)
       end
     end
   end
