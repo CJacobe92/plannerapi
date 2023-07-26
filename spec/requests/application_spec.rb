@@ -6,8 +6,6 @@ RSpec.describe "ApplicationController", type: :request do
 
   let!(:user) do
     User.create(
-      firstname: 'john',
-      lastname: 'wick',
       email: 'john.wick@example.com',
       password: 'password',
       password_confirmation: 'password'
