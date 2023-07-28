@@ -66,4 +66,41 @@ Rails.application.configure do
 
   # Uncomment if you wish to allow Action Cable access from any origin.
   # config.action_cable.disable_request_forgery_protection = true
+
+# host = 'localhost:3000'
+# config.action_mailer.default_url_options = { :host => 'localhost:3000', protocol: 'http' }
+
+# # SMTP settings for gmail
+# config.action_mailer.smtp_settings = {
+#   :address              => "smtp.gmail.com",
+#   :port                 => 587,
+#   :user_name            => 'cjacobe92devmailer@gmail.com',
+#   :password             => 'ksbapeoiafwfbfab',
+#   :authentication       => "plain",
+#   :enable_starttls_auto => true
+# }
+
+# config.action_mailer.delivery_method = :smtp
+# config.action_mailer.smtp_settings = {
+#   :user_name => '47b18dcf31062f',
+#   :password => '96b2a686d7b454',
+#   :address => 'sandbox.smtp.mailtrap.io',
+#   :host => 'sandbox.smtp.mailtrap.io',
+#   :port => '2525',
+#   :authentication => :cram_md5
+# }
+
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: 'smtp.gmail.com',
+    port: 587,
+    user_name: ENV['GMAIL_USERNAME'], # Replace with your Gmail email address
+    password:  ENV['GMAIL_PASSWORD'], # Replace with your Gmail password or app password
+    # user_name: 'cjacobedev92mailer@gmail.com',
+    # password: 'ksbapeoiafwfbfab',
+    authentication: 'plain',
+    enable_starttls_auto: true,
+    open_timeout: 5,
+    read_timeout: 5
+  }
 end
