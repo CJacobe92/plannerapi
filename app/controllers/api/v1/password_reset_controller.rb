@@ -1,14 +1,14 @@
 class Api::V1::PasswordResetController < ApplicationController
 include TokenHelper
-
+  skip_before_action :authenticate, only: [:update, :create]
 
   def create
-    user = User.find_by(email: params[:user][:email])
+    @user = User.find_by(email: params[:reset][:email])
 
-    if user
-      token = encode_reset_token({id: user.id, email: user.email})
-      user.update(reset_token_expiry: (Time.now + 1.hour).iso8601)
-      UserMailer.password_reset_email(user, token).deliver_later
+    if @user
+      token = encode_reset_token({id: @user.id})
+      @user.update(reset_token: token)
+      UserMailer.password_reset_email(@user, token).deliver_now
       render json: {message: 'Password reset email sent successfully'}, status: :ok
     else
       render json: { error: 'User not found' }, status: :not_found
@@ -16,19 +16,22 @@ include TokenHelper
   end
 
   def update
-    user = User.find_by(reset_token: params[:token])
+    token = params[:token]
+    decoded_token = decode_reset_token(token)
+    @user = User.find(decoded_token['id'])
 
-    if user && user.reset_token_expiry >= Time.now
-      user.update(password: params[:password], reset_token: nil, reset_token_expiry: nil)
-      render json: { message: 'Password reset successful' }, status: :ok
+    if @user.reset_token === token && Time.now < Time.parse(decoded_token['expiry'])
+      @user.update(password: params[:reset][:password], password_confirmation: params[:reset][:password_confirmation])
+      render json: { message: "Password changed successfully for #{@user.email}" }, status: :ok
     else
-      render json: { error: 'Invalid or expired reset token' }, status: :bad_request
+      render json: { error: 'Invalid or expired reset token' }, status: :unprocessable_entity
     end
   end
 
   private
 
   def password_reset_params
-    params.require(:user).permit(:email)
+    params.require(:reset).permit(:email, :password)
   end
+
 end
