@@ -21,7 +21,7 @@ include TokenHelper
     @user = User.find(decoded_token['id'])
 
     if @user.reset_token === token && Time.now < Time.parse(decoded_token['expiry'])
-      @user.update(password: params[:reset][:password], password_confirmation: params[:reset][:password_confirmation])
+      @user.update(password: params[:reset][:password], password_confirmation: params[:reset][:password_confirmation], reset_token: nil, token: nil)
       render json: { message: "Password changed successfully for #{@user.email}" }, status: :ok
     else
       render json: { error: 'Invalid or expired reset token' }, status: :unprocessable_entity
