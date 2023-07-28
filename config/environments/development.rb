@@ -92,13 +92,15 @@ Rails.application.configure do
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address:              'smtp.gmail.com',
-    port:                 587,
-    user_name:            'cjacobedev92mailer@gmail.com', # Replace with your Gmail email address
-    password:             'ksbapeoiafwfbfab', # Replace with your Gmail password or app password
-    authentication:       'plain',
+    address: 'smtp.gmail.com',
+    port: 587,
+    user_name: ENV['GMAIL_USERNAME'], # Replace with your Gmail email address
+    password:  ENV['GMAIL_PASSWORD'], # Replace with your Gmail password or app password
+    # user_name: 'cjacobedev92mailer@gmail.com',
+    # password: 'ksbapeoiafwfbfab',
+    authentication: 'plain',
     enable_starttls_auto: true,
-    open_timeout:         5,
-    read_timeout:         5
+    open_timeout: 5,
+    read_timeout: 5
   }
 end
