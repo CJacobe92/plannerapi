@@ -19,6 +19,9 @@ services:
     environment:
       RAILS_ENV: development
       DATABASE_URL: ${DATABASE_URL}
+      GMAIL_USERNAME: ${GMAIL_USERNAME}
+      GMAIL_PASSWORD: ${GMAIL_PASSWORD}
+
     volumes:
       - .:/app
     ports:
