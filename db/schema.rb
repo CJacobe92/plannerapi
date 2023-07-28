@@ -41,7 +41,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_07_28_093753) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "reset_token"
-    t.datetime "reset_token_expiry"
   end
 
   add_foreign_key "categories", "users"
